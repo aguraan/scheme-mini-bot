@@ -1,0 +1,40 @@
+{
+  "name": "scheme_mini_bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "dev": "nodemon index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aguraan/scheme_mini_bot.git"
+  },
+  "author": "aguraan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aguraan/scheme_mini_bot/issues"
+  },
+  "homepage": "https://github.com/aguraan/scheme_mini_bot#readme",
+  "nodemonConfig": {
+    "ignore": [
+      "src/db/data/*",
+      "src/google/credentials/*",
+      "debug.log"
+    ]
+  },
+  "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.1.6",
+    "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
+    "googleapis": "^59.0.0",
+    "handlebars": "^4.7.6",
+    "nodemailer": "^6.4.11",
+    "telegraf": "^3.38.0",
+    "telegraf-i18n": "^6.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}

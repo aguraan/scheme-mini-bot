@@ -1,0 +1,10 @@
+version: '3.7'
+services: 
+    bot:
+        container_name: scheme-mini-bot
+        restart: always
+        build: ./app
+        volumes:
+            - ./data/db:/usr/src/app/src/db/data
+            - ./data/google_credentials:/usr/src/app/src/google/credentials
+            - ${PWD}/data/log/debug.log:/usr/src/app/debug.log
