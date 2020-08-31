@@ -4,6 +4,8 @@ services:
         container_name: scheme-mini-bot
         restart: always
         build: ./app
+        ports: 
+            - 3001:3001
         volumes:
             - ./data/db:/usr/src/app/src/db/data
             - ./data/google_credentials:/usr/src/app/src/google/credentials
