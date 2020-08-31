@@ -61,9 +61,10 @@ scene.hears(match('buttons.send'), async ctx => {
     try {
         const { city, address, email } = ctx.session.form
         const recipients = [EMAIL_ADDRESS, email].join(', ')
+        const subject = ctx.i18n.t('other.new_order_subject', { city, address })
         await ctx.sendMail({
             to: recipients,
-            subject: `${ city } | ${ address }`,
+            subject,
             html: await createMailHTML(ctx),
             attachments: await createMailAttachments(ctx)
         })

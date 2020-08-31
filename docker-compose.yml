@@ -8,3 +8,5 @@ services:
             - ./data/db:/usr/src/app/src/db/data
             - ./data/google_credentials:/usr/src/app/src/google/credentials
             - ${PWD}/data/log/debug.log:/usr/src/app/debug.log
+        environment: 
+            NODE_ENV: production
