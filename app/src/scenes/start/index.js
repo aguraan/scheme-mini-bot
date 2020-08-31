@@ -5,7 +5,6 @@ const {
     getMainKeyboard,
     getInfoInlineKeyboard
 } = require('../keyboards')
-const { logWarn } = require('../../util/log')
 
 
 const scene = new Scene('start')
