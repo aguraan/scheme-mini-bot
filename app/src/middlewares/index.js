@@ -49,7 +49,7 @@ composer.use(stage.middleware())
 
 composer.command('start', ctx => ctx.scene.enter('start'))
 composer.on('message', async ctx => {
-    await ctx.reply(ctx.i18n.t('scenes.start.restart'))
+    await ctx.replyWithHTML(ctx.i18n.t('scenes.start.restart'))
 })
 
 module.exports = composer

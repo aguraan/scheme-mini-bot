@@ -78,7 +78,7 @@ scene.on('callback_query', async ctx => {
     }
 })
 
-scene.command('admin', async ctx => {
+scene.command(['admin', 'start'], async ctx => {
     await ctx.scene.reenter()
 })
 
