@@ -49,23 +49,27 @@ scene.hears(match('buttons.info'), async ctx => {
 scene.on('callback_query', async ctx => {
     const data = JSON.parse(ctx.update.callback_query.data)
     if (data.type === 'info') {
+        const locale = ctx.i18n.locale()
         switch (data.val) {
             case 'process': {
                 const url = await ctx.db.urls.findById('process')
                 await recordUrlClick(ctx, url)
-                await ctx.replyWithHTML(url.href)
+                const href = locale in url.href ? url.href[locale] : ctx.i18n.t('other.edit_links_not_found')
+                await ctx.replyWithHTML(href)
                 break
             }
             case 'prices': {
                 const url = await ctx.db.urls.findById('prices')
                 await recordUrlClick(ctx, url)
-                await ctx.replyWithHTML(url.href)
+                const href = locale in url.href ? url.href[locale] : ctx.i18n.t('other.edit_links_not_found')
+                await ctx.replyWithHTML(href)
                 break
             }
             case 'examples': {
                 const url = await ctx.db.urls.findById('examples')
                 await recordUrlClick(ctx, url)
-                await ctx.replyWithHTML(url.href)
+                const href = locale in url.href ? url.href[locale] : ctx.i18n.t('other.edit_links_not_found')
+                await ctx.replyWithHTML(href)
                 break
             }
         }
