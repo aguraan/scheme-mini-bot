@@ -19,6 +19,8 @@ scene.enter(async ctx => {
     await ctx.replyWithHTML(ctx.i18n.t('other.admin'), getAdminKeyboard(ctx))
 })
 
+scene.command('start', async ctx => await ctx.scene.enter('start'))
+
 scene.hears(match('buttons.auth'), async ctx => {
     const url = getAuthURL(ctx.oAuth2Client)
 

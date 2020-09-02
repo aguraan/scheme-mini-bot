@@ -34,6 +34,8 @@ scene.enter(async ctx => {
         })
 })
 
+scene.command('start', async ctx => await ctx.scene.enter('start'))
+
 scene.on('callback_query', async ctx => {
     const data = JSON.parse(ctx.update.callback_query.data)
     if (data && data.type === 'del') {

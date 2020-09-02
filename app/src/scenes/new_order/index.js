@@ -13,6 +13,8 @@ scene.enter(async ctx => {
     )
 })
 
+scene.command('start', async ctx => await ctx.scene.enter('start'))
+
 scene.hears(match('buttons.continue'), async ctx => {
     await nextScene(ctx)
 })
