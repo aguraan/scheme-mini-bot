@@ -13,6 +13,8 @@ scene.enter(async ctx => {
     await ctx.replyWithHTML(html, keyboard)
 })
 
+scene.command('start', async ctx => await ctx.scene.enter('start'))
+
 scene.hears(match('buttons.continue'), async ctx => {
     const { form } = ctx.session
     if (!form.files) form.files = []

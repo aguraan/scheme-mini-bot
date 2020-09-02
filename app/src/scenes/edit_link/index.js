@@ -18,6 +18,8 @@ scene.enter(async ctx => {
     }
 })
 
+scene.command('start', async ctx => await ctx.scene.enter('start'))
+
 scene.hears(match('buttons.back'), async ctx => await ctx.scene.enter('admin'))
 
 scene.on('text', async ctx => {

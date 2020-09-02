@@ -11,6 +11,8 @@ scene.enter(async ctx => {
     await ctx.replyWithHTML(ctx.i18n.t('scenes.new_order.city'), keyboard)
 })
 
+scene.command('start', async ctx => await ctx.scene.enter('start'))
+
 scene.hears(match('buttons.back'), async ctx => await nextScene(ctx))
 scene.hears(match('buttons.cancel'), async ctx => await ctx.scene.enter('start'))
 

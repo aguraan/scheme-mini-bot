@@ -21,6 +21,8 @@ scene.on('location', async ctx => {
     await nextScene(ctx)
 })
 
+scene.command('start', async ctx => await ctx.scene.enter('start'))
+
 scene.on('text', async ctx => {
     const answer = ctx.message.text.trim()
     ctx.session.form.address = answer
