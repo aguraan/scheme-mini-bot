@@ -10,6 +10,7 @@ const {
     createMailHTML
 } = require('../../helpers')
 const { EMAIL_ADDRESS } = process.env
+const { logWarn } = require('../../util/log')
 
 const scene = new Scene('order_review')
 
@@ -73,6 +74,7 @@ scene.hears(match('buttons.send'), async ctx => {
         await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.success_msg'))
     } catch (error) {
         await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.error_msg'))
+        logWarn(error, ctx)
     } finally {
         await ctx.scene.enter('start')
     }
