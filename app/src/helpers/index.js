@@ -32,20 +32,15 @@ const createMailAttachments = async ctx => {
     const { files } = ctx.session.form
     return await Promise.all(
         files.map(async file => {
-            if (file.type === 'photo') {
-                const photo = {}
-                photo.path = await ctx.tg.getFileLink(file.id)
-                photo.filename = photo.path.split('/').pop()
-                photo.cid = file.cid
-                if (file.caption) photo.caption = file.caption
-                return photo
-            }
+            const res = {}
             if (file.type === 'document') {
-                const doc = {}
-                doc.path = await ctx.tg.getFileLink(file.id)
-                doc.filename = file.filename
-                if (file.caption) photo.caption = file.caption
-                return doc
+                res.path = await ctx.tg.getFileLink(file.id)
+                res.filename = file.filename
+                return res
+            } else {
+                res.path = await ctx.tg.getFileLink(file.id)
+                res.filename = res.path.split('/').pop()
+                return res
             }
         })
     )
@@ -118,11 +113,27 @@ const exportURLStatsInHTML = async ctx => {
     return json2html(await Promise.all(data))
 }
 
+const isFileSizeSumLess20MB = files => {
+    const sum = files.reduce((acc, file) => (acc + file.size), 0)
+    return sum < (20 * 1024 * 1024)
+}
+
+const bytesToReadableValue = bytes => {
+    if (bytes) {
+        const kb = bytes / 1024
+        if (kb > 1023) return (kb / 1024).toFixed(1) + ' MB'
+        return kb.toFixed(1) + ' KB'
+    }
+    return ''
+}
+
 module.exports = {
     nextScene,
     createMailAttachments,
     createMailHTML,
     sendNotification,
     recordUrlClick,
-    exportURLStatsInHTML
+    exportURLStatsInHTML,
+    isFileSizeSumLess20MB,
+    bytesToReadableValue
 }

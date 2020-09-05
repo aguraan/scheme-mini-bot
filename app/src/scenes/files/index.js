@@ -25,28 +25,63 @@ scene.hears(match('buttons.back'), async ctx => await nextScene(ctx))
 scene.hears(match('buttons.cancel'), async ctx => await ctx.scene.enter('start'))
 
 scene.on('photo', ctx => {
-    const { caption, photo } = ctx.message
-    const { file_id, file_unique_id } = photo[photo.length-1]
+    const { photo } = ctx.message
+    const { file_id, file_size } = photo[photo.length-1]
     const { form } = ctx.session
     if (!form.files) form.files = []
     form.files.push({
         type: 'photo',
-        cid: file_unique_id,
         id: file_id,
-        caption
+        size: file_size
     })
 })
 
 scene.on('document', ctx => {
-    const { caption, document } = ctx.message
-    const { file_id, file_name } = document
+    const { document } = ctx.message
+    const { file_id, file_name, file_size } = document
     const { form } = ctx.session
     if (!form.files) form.files = []
     form.files.push({
         type: 'document',
         id: file_id,
         filename: file_name,
-        caption
+        size: file_size
+    })
+})
+
+scene.on('audio', ctx => {
+    const { audio } = ctx.message
+    const { file_id, file_size } = audio
+    const { form } = ctx.session
+    if (!form.files) form.files = []
+    form.files.push({
+        type: 'audio',
+        id: file_id,
+        size: file_size
+    })
+})
+
+scene.on('video', ctx => {
+    const { video } = ctx.message
+    const { file_id, file_size } = video
+    const { form } = ctx.session
+    if (!form.files) form.files = []
+    form.files.push({
+        type: 'video',
+        id: file_id,
+        size: file_size
+    })
+})
+
+scene.on('voice', ctx => {
+    const { voice } = ctx.message
+    const { file_id, file_size } = voice
+    const { form } = ctx.session
+    if (!form.files) form.files = []
+    form.files.push({
+        type: 'voice',
+        id: file_id,
+        size: file_size
     })
 })
 

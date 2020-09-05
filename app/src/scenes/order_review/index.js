@@ -7,7 +7,9 @@ const {
 } = require('../keyboards')
 const {
     createMailAttachments,
-    createMailHTML
+    createMailHTML,
+    isFileSizeSumLess20MB,
+    bytesToReadableValue
 } = require('../../helpers')
 const { EMAIL_ADDRESS } = process.env
 const { logWarn } = require('../../util/log')
@@ -18,21 +20,41 @@ scene.enter(async ctx => {
     const { form } = ctx.session
     const html = ctx.i18n.t('scenes.order_review.result', form)
     await ctx.replyWithHTML(html, getOrderReviewKeyboard(ctx))
-    form.files
-        .forEach(async (file, i) => {
-            const data = { i }
-            const extra = { caption: file.caption }
-            if (file.type === 'photo') {
-                await ctx.replyWithPhoto(file.id,
-                    getDeleteInlineKeyboard(ctx, data, extra)
-                )
-            }
-            if (file.type === 'document') {
-                await ctx.replyWithDocument(file.id,
-                    getDeleteInlineKeyboard(ctx, data, extra)
-                )
-            }
-        })
+    await Promise.all(
+        form.files
+            .map(async (file, i) => {
+                const data = { i }
+                const extra = { caption:  `${ctx.i18n.t('other.file_size')}: ${ bytesToReadableValue(file.size) }`}
+                if (file.type === 'photo') {
+                    return await ctx.replyWithPhoto(file.id,
+                        getDeleteInlineKeyboard(ctx, data, extra)
+                    )
+                }
+                if (file.type === 'document') {
+                    return await ctx.replyWithDocument(file.id,
+                        getDeleteInlineKeyboard(ctx, data, extra)
+                    )
+                }
+                if (file.type === 'audio') {
+                    return await ctx.replyWithAudio(file.id,
+                        getDeleteInlineKeyboard(ctx, data, extra)
+                    )
+                }
+                if (file.type === 'voice') {
+                    return await ctx.replyWithVoice(file.id,
+                        getDeleteInlineKeyboard(ctx, data, extra)
+                    )
+                }
+                if (file.type === 'video') {
+                    return await ctx.replyWithVideo(file.id,
+                        getDeleteInlineKeyboard(ctx, data, extra)
+                    )
+                }
+            })
+    )
+    if (!isFileSizeSumLess20MB(form.files)) {
+        await ctx.replyWithHTML(ctx.i18n.t('validation.file_size'))
+    }
 })
 
 scene.command('start', async ctx => await ctx.scene.enter('start'))
@@ -60,23 +82,27 @@ scene.hears(match('buttons.edit'), async ctx => {
 })
 
 scene.hears(match('buttons.send'), async ctx => {
-    await ctx.replyWithHTML(ctx.i18n.t('other.sending'))
-    try {
-        const { city, address, email } = ctx.session.form
-        const recipients = [EMAIL_ADDRESS, email].join(', ')
-        const subject = ctx.i18n.t('other.new_order_subject', { city, address })
-        await ctx.sendMail({
-            to: recipients,
-            subject,
-            html: await createMailHTML(ctx),
-            attachments: await createMailAttachments(ctx)
-        })
-        await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.success_msg'))
-    } catch (error) {
-        await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.error_msg'))
-        logWarn(error, ctx)
-    } finally {
-        await ctx.scene.enter('start')
+    if (isFileSizeSumLess20MB(ctx.session.form.files)) {
+        await ctx.replyWithHTML(ctx.i18n.t('other.sending'))
+        try {
+            const { city, address, email } = ctx.session.form
+            const recipients = [EMAIL_ADDRESS, email].join(', ')
+            const subject = ctx.i18n.t('other.new_order_subject', { city, address })
+            await ctx.sendMail({
+                to: recipients,
+                subject,
+                html: await createMailHTML(ctx),
+                attachments: await createMailAttachments(ctx)
+            })
+            await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.success_msg'))
+        } catch (error) {
+            await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.error_msg'))
+            logWarn(error, ctx)
+        } finally {
+            await ctx.scene.enter('start')
+        }
+    } else {
+        await ctx.replyWithHTML(ctx.i18n.t('validation.file_size'))
     }
 })
 
