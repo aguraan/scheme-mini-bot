@@ -59,7 +59,7 @@ const sendNotification = async (type, ctx) => {
                     subject: `У нас новый пользователь! ${ first_name } ${ last_name }`,
                     html: template({
                         id,
-                        name: `${ first_name } ${ last_name }`,
+                        name: `${ first_name || '' } ${ last_name || '' }`,
                         username: username || 'не установлен'
                     })
                 })
@@ -104,7 +104,7 @@ const exportURLStatsInHTML = async ctx => {
             if (user) {
                 const { first_name, last_name } = user
                 return {
-                    'Пользователь': `${ first_name } ${ last_name }`,
+                    'Пользователь': `${ first_name || '' } ${ last_name || '' }`,
                     ...data
                 }
             }
