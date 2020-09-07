@@ -37,7 +37,7 @@ scene.hears(match('buttons.export'), async ctx => {
         const coll = await ctx.db.users.find()
         const html = json2html(coll.map(item => {
             if (item.created) {
-                const created = new Date(item.created).toLocaleDateString()
+                const created = new Date(item.created).toLocaleDateString('uk')
                 return { ...item, created }
             }
             return item

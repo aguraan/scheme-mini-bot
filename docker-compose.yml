@@ -10,5 +10,8 @@ services:
             - ./data/db:/usr/src/app/src/db/data
             - ./data/google_credentials:/usr/src/app/src/google/credentials
             - ./data/log/debug.log:/usr/src/app/debug.log
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
         environment: 
             NODE_ENV: production
+            TZ: Europe/Kiev
