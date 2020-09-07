@@ -1,5 +1,6 @@
 FROM node:14.5.0-slim
 
+ENV TZ=Europe/Kiev
 WORKDIR /usr/src/app
 
 COPY package*.json ./
