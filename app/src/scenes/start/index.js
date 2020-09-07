@@ -13,7 +13,10 @@ scene.enter(async ctx => {
 
     const user = await ctx.db.users.findById(ctx.from.id)
     if (!user) {
-        const newUser = await ctx.db.users.create(ctx.from)
+        const newUser = await ctx.db.users.create({
+            ...ctx.from,
+            created: Date.now()
+        })
         ctx.session.userId = newUser.id
         sendNotification('newuser', ctx)
     } else {

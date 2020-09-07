@@ -2,7 +2,6 @@ const Scene = require('telegraf/scenes/base')
 const { match } = require('telegraf-i18n')
 const {
     getAuthURLInlineKeyboard,
-    getMainKeyboard,
     getAdminKeyboard,
     getEditLinksInlineKeyboard
 } = require('../keyboards')
@@ -11,6 +10,7 @@ const {
     getAuthURL
 } = require('../../google')
 const { logWarn } = require('../../util/log')
+const json2html = require('../../util/json2html')
 const { exportURLStatsInHTML } = require('../../helpers')
 
 const scene = new Scene('admin')
@@ -34,7 +34,14 @@ scene.hears(match('buttons.auth'), async ctx => {
 scene.hears(match('buttons.export'), async ctx => {
     try {
         await ctx.replyWithHTML(ctx.i18n.t('other.exporting'))
-        const html = await ctx.db.users.exportHTML()
+        const coll = await ctx.db.users.find()
+        const html = json2html(coll.map(item => {
+            if (item.created) {
+                const created = new Date(item.created).toLocaleDateString()
+                return { ...item, created }
+            }
+            return item
+        }))
         await ctx.replyWithHTML(ctx.i18n.t('other.sending'))
         await ctx.sendMail({
             to: process.env.EMAIL_ADDRESS,

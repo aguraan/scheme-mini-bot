@@ -2,7 +2,6 @@ const Scene = require('telegraf/scenes/base')
 const { match } = require('telegraf-i18n')
 const { getFilesKeyboard } = require('../keyboards')
 const { nextScene } = require('../../helpers')
-const { print } = require('../../util/log')
 
 const scene = new Scene('files')
 
