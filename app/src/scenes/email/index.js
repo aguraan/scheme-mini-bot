@@ -2,6 +2,7 @@ const Scene = require('telegraf/scenes/base')
 const { match } = require('telegraf-i18n')
 const { getCancelKeyboard } = require('../keyboards')
 const { nextScene } = require('../../helpers')
+const EmailValidator = require('email-deep-validator')
 
 const scene = new Scene('email')
 
@@ -19,7 +20,10 @@ scene.hears(match('buttons.cancel'), async ctx => await ctx.scene.enter('start')
 scene.on('text', async ctx => {
     const answer = ctx.message.text.trim()
     const validEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(answer)
-    if (validEmail) {
+    const emailValidator = new EmailValidator()
+    ctx.replyWithChatAction('typing')
+    const { wellFormed, validDomain } = await emailValidator.verify(answer)
+    if (validEmail && wellFormed && validDomain) {
         ctx.session.form.email = answer
         await nextScene(ctx)
     } else {

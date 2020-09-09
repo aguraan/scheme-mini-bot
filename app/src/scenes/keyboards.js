@@ -31,6 +31,11 @@ const getInfoInlineKeyboard = ctx => {
         [Markup.callbackButton(ctx.i18n.t('inline.prices'), JSON.stringify({ ...type, val: 'prices' }))],
     ]).extra()
 }
+const getTimeoutKeyboard = ctx => {
+    return Markup.inlineKeyboard([
+        [Markup.callbackButton(ctx.i18n.t('inline.ok'), JSON.stringify({ type: 'timeout' }))],
+    ]).extra()
+}
 
 const getNewOrderKeyboard = ctx => {
     return Markup.keyboard([
@@ -122,5 +127,6 @@ module.exports = {
     getDeleteInlineKeyboard,
     getEditInlineKeyboard,
     getAuthURLInlineKeyboard,
-    getEditLinksInlineKeyboard
+    getEditLinksInlineKeyboard,
+    getTimeoutKeyboard
 }

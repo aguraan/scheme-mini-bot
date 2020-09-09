@@ -29,9 +29,10 @@ const createMailHTML = async ctx => {
 }
 
 const createMailAttachments = async ctx => {
-    const { files } = ctx.session.form
+    let { form } = ctx.session
+    if (form.files == null) form.files = []
     return await Promise.all(
-        files.map(async file => {
+        form.files.map(async file => {
             const res = {}
             if (file.type === 'document') {
                 res.path = await ctx.tg.getFileLink(file.id)
@@ -50,18 +51,47 @@ const sendNotification = async (type, ctx) => {
     if (type === 'newuser') {
         const user = await ctx.db.users.findById(ctx.session.userId)
         if (user) {
-            const { first_name, last_name, id, username } = user
+            const { first_name = '', last_name = '', id, username = 'не установлен' } = user
+            const name = `${ first_name } ${ last_name }`.trim()
             const file = await fs.readFile(path.resolve(__dirname, '..', 'templates', 'new_user.html'), 'utf-8')
             const template = handlebars.compile(file)
             try {
                 await ctx.sendMail({
                     to: process.env.EMAIL_ADDRESS,
-                    subject: `У нас новый пользователь! ${ first_name } ${ last_name }`,
-                    html: template({
-                        id,
-                        name: `${ first_name || '' } ${ last_name || '' }`,
-                        username: username || 'не установлен'
-                    })
+                    subject: `У нас новый пользователь! ${ name }`,
+                    html: template({ id, name, username })
+                })
+            } catch (error) {
+                logWarn(error, ctx)
+            }
+        }
+    } else if (type === 'form_timeout') {
+        const user = await ctx.db.users.findById(ctx.session.userId)
+        if (user) {
+            const { first_name = '', last_name = '' } = user
+            const name = `${ first_name } ${ last_name }`.trim()
+            try {
+                await ctx.sendMail({
+                    to: process.env.EMAIL_ADDRESS,
+                    subject: `Пользователь ${ name } не завершил заполнение заявки!`,
+                    html: await createMailHTML(ctx),
+                    attachments: await createMailAttachments(ctx)
+                })
+            } catch (error) {
+                logWarn(error, ctx)
+            }
+        }
+    } else if (type === 'form_canceled') {
+        const user = await ctx.db.users.findById(ctx.session.userId)
+        if (user) {
+            const { first_name = '', last_name = '' } = user
+            const name = `${ first_name } ${ last_name }`.trim()
+            try {
+                await ctx.sendMail({
+                    to: process.env.EMAIL_ADDRESS,
+                    subject: `Пользователь ${ name } отменил заполнение заявки!`,
+                    html: await createMailHTML(ctx),
+                    attachments: await createMailAttachments(ctx)
                 })
             } catch (error) {
                 logWarn(error, ctx)
@@ -102,9 +132,9 @@ const exportURLStatsInHTML = async ctx => {
         .map(async ([userId, data]) => {
             const user = await ctx.db.users.findById(parseInt(userId, 10))
             if (user) {
-                const { first_name, last_name } = user
+                const { first_name = '', last_name = '' } = user
                 return {
-                    'Пользователь': `${ first_name || '' } ${ last_name || '' }`,
+                    'Пользователь': `${ first_name } ${ last_name }`,
                     ...data
                 }
             }

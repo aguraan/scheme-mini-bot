@@ -24,4 +24,8 @@ scene.on('text', async ctx => {
     await nextScene(ctx)
 })
 
+scene.on('message', async ctx => {
+    await ctx.replyWithHTML(ctx.i18n.t('validation.contact_name'))
+})
+
 module.exports = scene

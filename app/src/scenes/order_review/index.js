@@ -19,7 +19,6 @@ const scene = new Scene('order_review')
 scene.enter(async ctx => {
     const { form } = ctx.session
     const html = ctx.i18n.t('scenes.order_review.result', form)
-    await ctx.replyWithHTML(html, getOrderReviewKeyboard(ctx))
     await Promise.all(
         form.files
             .map(async (file, i) => {
@@ -52,6 +51,7 @@ scene.enter(async ctx => {
                 }
             })
     )
+    await ctx.replyWithHTML(html, getOrderReviewKeyboard(ctx))
     if (!isFileSizeSumLess20MB(form.files)) {
         await ctx.replyWithHTML(ctx.i18n.t('validation.file_size'))
     }
@@ -62,11 +62,16 @@ scene.command('start', async ctx => await ctx.scene.enter('start'))
 scene.on('callback_query', async ctx => {
     const data = JSON.parse(ctx.update.callback_query.data)
     if (data && data.type === 'del') {
-        await ctx.deleteMessage(ctx.update.callback_query.message.message_id)
+        const { message_id } = ctx.update.callback_query.message
+        await ctx.deleteMessage(message_id)
         ctx.session.form.files.splice(data.i, 1)
     }
     if (data && data.type === 'edit') {
         ctx.scene.enter(data.val)
+    }
+    if (data && data.type === 'timeout') {
+        const { message_id } = ctx.update.callback_query.message
+        await ctx.deleteMessage(message_id)
     }
 })
 
@@ -94,7 +99,9 @@ scene.hears(match('buttons.send'), async ctx => {
                 html: await createMailHTML(ctx),
                 attachments: await createMailAttachments(ctx)
             })
+            ctx.session.form.sended = true
             await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.success_msg'))
+            await ctx.db.users.update(ctx.from.id, { can: true }) // can send orders
         } catch (error) {
             await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.error_msg'))
             logWarn(error, ctx)

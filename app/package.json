@@ -28,6 +28,7 @@
     "@googlemaps/google-maps-services-js": "^3.1.6",
     "axios": "^0.19.2",
     "dotenv": "^8.2.0",
+    "email-deep-validator": "^3.3.0",
     "googleapis": "^59.0.0",
     "handlebars": "^4.7.6",
     "nodemailer": "^6.4.11",

@@ -16,8 +16,15 @@ context.db = require('./db')
 
 context.oAuth2Client = createOAuth2Client()
 
-context.sendMail = async function(options) {
-    await sendMail(this.oAuth2Client, options)
+context.sendMail = function(options) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await sendMail(this.oAuth2Client, options)
+            resolve()
+        } catch (error) {
+            reject(error)
+        }
+    })
 }
 
 module.exports = context

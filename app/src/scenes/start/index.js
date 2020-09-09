@@ -3,45 +3,48 @@ const { sendNotification, recordUrlClick } = require('../../helpers')
 const { match } = require('telegraf-i18n')
 const {
     getMainKeyboard,
-    getInfoInlineKeyboard
+    getInfoInlineKeyboard,
+    getTimeoutKeyboard
 } = require('../keyboards')
+const Form = require('./Form')
 
 
 const scene = new Scene('start')
 
 scene.enter(async ctx => {
 
-    const user = await ctx.db.users.findById(ctx.from.id)
+    await ctx.replyWithHTML(ctx.i18n.t('scenes.start.make_your_choice'), getMainKeyboard(ctx))
+
+    let user = await ctx.db.users.findById(ctx.from.id)
     if (!user) {
-        const newUser = await ctx.db.users.create({
+        user = await ctx.db.users.create({
             ...ctx.from,
             created: Date.now()
         })
-        ctx.session.userId = newUser.id
-        sendNotification('newuser', ctx)
-    } else {
-        ctx.session.userId = user.id
+        await sendNotification('newuser', ctx)
     }
+    ctx.session.userId = user.id
 
     if (ctx.i18n.locale() !== ctx.from.language_code) {
         ctx.i18n.locale(ctx.from.language_code)
     }
 
-    ctx.session.form = null
-    await ctx.replyWithHTML(ctx.i18n.t('scenes.start.make_your_choice'), getMainKeyboard(ctx))
+    if (ctx.session.form) {
+        ctx.session.form.clearTimeout()
+        ctx.session.form.removeAllListeners('timeout')
+        if (ctx.session.form.sended === false && !user.can) await sendNotification('form_canceled', ctx)
+    }
 })
 
 scene.hears(match('buttons.new_order'), async ctx => {
-    ctx.session.form = {
-        city: '',
-        address: '',
-        contact_name: '',
-        phone_number: '',
-        files: null,
-        comments: '',
-        formats: '',
-        email: ''
-    }
+    ctx.session.form = new Form()
+    ctx.session.form.once('timeout', async () => {
+        ctx.replyWithHTML(ctx.i18n.t('other.timeout_msg'), getTimeoutKeyboard(ctx))
+        const user = await ctx.db.users.findById(ctx.from.id)
+        if (user && !user.can) { // can't send orders
+            sendNotification('form_timeout', ctx)
+        }
+    })
     await ctx.scene.enter('new_order')
 })
 

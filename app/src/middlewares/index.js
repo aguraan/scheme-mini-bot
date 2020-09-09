@@ -47,6 +47,13 @@ composer.use(session())
 composer.use(i18n.middleware())
 composer.use(stage.middleware())
 
+composer.on('callback_query', async ctx => {
+    const data = JSON.parse(ctx.update.callback_query.data)
+    if (data && data.type === 'timeout') {
+        const { message_id } = ctx.update.callback_query.message
+        await ctx.deleteMessage(message_id)
+    }
+})
 composer.command('start', ctx => ctx.scene.enter('start'))
 composer.on('message', async ctx => {
     await ctx.replyWithHTML(ctx.i18n.t('scenes.start.restart'))
