@@ -49,7 +49,7 @@ const createMailAttachments = async ctx => {
 
 const sendNotification = async (type, ctx) => {
     if (type === 'newuser') {
-        const user = await ctx.db.users.findById(ctx.session.userId)
+        const user = await ctx.db.users.findById(ctx.from.id)
         if (user) {
             const { first_name = '', last_name = '', id, username = 'не установлен' } = user
             const name = `${ first_name } ${ last_name }`.trim()
@@ -66,7 +66,7 @@ const sendNotification = async (type, ctx) => {
             }
         }
     } else if (type === 'form_timeout') {
-        const user = await ctx.db.users.findById(ctx.session.userId)
+        const user = await ctx.db.users.findById(ctx.from.id)
         if (user) {
             const { first_name = '', last_name = '' } = user
             const name = `${ first_name } ${ last_name }`.trim()
@@ -82,7 +82,7 @@ const sendNotification = async (type, ctx) => {
             }
         }
     } else if (type === 'form_canceled') {
-        const user = await ctx.db.users.findById(ctx.session.userId)
+        const user = await ctx.db.users.findById(ctx.from.id)
         if (user) {
             const { first_name = '', last_name = '' } = user
             const name = `${ first_name } ${ last_name }`.trim()
