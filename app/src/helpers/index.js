@@ -3,6 +3,7 @@ const path = require('path')
 const fs = require('fs/promises')
 const { logWarn } = require('../util/log')
 const json2html = require('../util/json2html')
+const { Buffer } = require('buffer')
 
 const nextScene = async ctx => {
     const { form } = ctx.session
@@ -32,14 +33,21 @@ const createMailAttachments = async ctx => {
     let { form } = ctx.session
     if (form.files == null) form.files = []
     return await Promise.all(
-        form.files.map(async file => {
+        form.files.map(async (file, i) => {
             const res = {}
-            if (file.type === 'document') {
+            try {
                 res.path = await ctx.tg.getFileLink(file.id)
+            } catch (error) {
+                const content = Buffer.from(JSON.stringify(file)).toString('base64')
+                return {
+                    filename: `bad_file${ i + 1 }.txt`,
+                    content
+                }
+            }
+            if (file.type === 'document') {
                 res.filename = file.filename
                 return res
             } else {
-                res.path = await ctx.tg.getFileLink(file.id)
                 res.filename = res.path.split('/').pop()
                 return res
             }
@@ -157,6 +165,31 @@ const bytesToReadableValue = bytes => {
     return ''
 }
 
+const sending = async (ctx, func) => {
+    const message = await ctx.reply('— 📩💨 💨 💨')
+    const { message_id } = message
+    let i = 3
+    const step = () => {
+        i++
+        const progress = [
+            '— 📩        ',
+            '— 📩💨      ',
+            '— 📩💨 💨   ',
+            '— 📩💨 💨 💨'
+        ]
+        return progress[i % 4]
+    }
+    let timerId = setInterval(async () => {
+        await ctx.tg.editMessageText(ctx.chat.id, message_id, null, step())
+    }, 500)
+    
+    await func()
+
+    clearInterval(timerId)
+    timerId = null
+    await ctx.deleteMessage(message_id)
+}
+
 module.exports = {
     nextScene,
     createMailAttachments,
@@ -165,5 +198,6 @@ module.exports = {
     recordUrlClick,
     exportURLStatsInHTML,
     isFileSizeSumLess20MB,
-    bytesToReadableValue
+    bytesToReadableValue,
+    sending
 }

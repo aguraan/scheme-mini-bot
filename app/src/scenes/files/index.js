@@ -37,7 +37,7 @@ scene.on('photo', ctx => {
 
 scene.on('document', ctx => {
     const { document } = ctx.message
-    const { file_id, file_name, file_size } = document
+    const { file_id, file_name, file_size, file_unique_id } = document
     const { form } = ctx.session
     if (!form.files) form.files = []
     form.files.push({

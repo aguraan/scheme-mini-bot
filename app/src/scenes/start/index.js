@@ -12,7 +12,6 @@ const Form = require('./Form')
 const scene = new Scene('start')
 
 scene.enter(async ctx => {
-
     await ctx.replyWithHTML(ctx.i18n.t('scenes.start.make_your_choice'), getMainKeyboard(ctx))
 
     let user = await ctx.db.users.findById(ctx.from.id)

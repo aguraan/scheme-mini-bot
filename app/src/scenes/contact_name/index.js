@@ -1,7 +1,7 @@
 const Scene = require('telegraf/scenes/base')
 const { match } = require('telegraf-i18n')
 const {
-    getCancelKeyboard
+    getNavKeyboard
 } = require('../keyboards')
 const { nextScene } = require('../../helpers')
 
@@ -9,7 +9,7 @@ const scene = new Scene('contact_name')
 
 scene.enter(async ctx => {
     const { contact_name } = ctx.session.form
-    const keyboard = getCancelKeyboard(ctx, !!contact_name)
+    const keyboard = getNavKeyboard(ctx, contact_name ? ['back'] : ['cancel'])
     await ctx.replyWithHTML(ctx.i18n.t('scenes.new_order.contact_name'), keyboard)
 })
 

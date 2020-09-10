@@ -7,7 +7,7 @@ class Form extends EventEmitter {
     #files = null
     #comments = ''
     #formats = ''
-    #email = ''
+    #emails = null
     #timerId = undefined
 
     #timeout = function() {
@@ -90,13 +90,13 @@ class Form extends EventEmitter {
                 },
                 enumerable: true
             },
-            email: {
+            emails: {
                 get() {
-                    return this.#email
+                    return this.#emails
                 },
                 set(val) {
                     this.#timeout()
-                    this.#email = val
+                    this.#emails = val
                 },
                 enumerable: true
             },

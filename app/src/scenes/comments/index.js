@@ -1,19 +1,30 @@
 const Scene = require('telegraf/scenes/base')
 const { match } = require('telegraf-i18n')
-const { getCancelKeyboard } = require('../keyboards')
+const { getNavKeyboard } = require('../keyboards')
 const { nextScene } = require('../../helpers')
 
 const scene = new Scene('comments')
 
 scene.enter(async ctx => {
-    const { comments } = ctx.session.form
-    const keyboard = getCancelKeyboard(ctx, !!comments) 
+    const { comments, files } = ctx.session.form
+    const buttons = []
+
+    if (comments) buttons.push('back')
+    else buttons.push('cancel')
+
+    if (files && files.length) buttons.push('continue')
+
+    const keyboard = getNavKeyboard(ctx, buttons) 
     await ctx.replyWithHTML(ctx.i18n.t('scenes.new_order.comments'), keyboard)
 })
 
 scene.command('start', async ctx => await ctx.scene.enter('start'))
 
 scene.hears(match('buttons.back'), async ctx => await nextScene(ctx))
+scene.hears(match('buttons.continue'), async ctx => {
+    ctx.session.form.comments = '🍪'
+    await nextScene(ctx)
+})
 scene.hears(match('buttons.cancel'), async ctx => await ctx.scene.enter('start'))
 
 scene.on('text', async ctx => {

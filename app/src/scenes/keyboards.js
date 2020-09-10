@@ -12,6 +12,7 @@ const getAdminKeyboard = ctx => {
         [ctx.i18n.t('buttons.auth')],
         [ctx.i18n.t('buttons.export')],
         [ctx.i18n.t('buttons.edit_links')],
+        [ctx.i18n.t('buttons.get_file')],
         [ctx.i18n.t('buttons.url_stats')],
         [ctx.i18n.t('buttons.exit')]
     ]).resize().extra()
@@ -37,6 +38,12 @@ const getTimeoutKeyboard = ctx => {
     ]).extra()
 }
 
+const getEmailInlineKeyboard = (ctx, data) => {
+    return Markup.inlineKeyboard([
+        [Markup.callbackButton(ctx.i18n.t('inline.delete'), JSON.stringify({ type: 'email', ...data }))]
+    ]).extra()
+}
+
 const getNewOrderKeyboard = ctx => {
     return Markup.keyboard([
         [ctx.i18n.t('buttons.continue')],
@@ -51,17 +58,27 @@ const getCityKeyboard = (ctx, back) => {
     ]).resize().extra()
 }
 
-const getCancelKeyboard = (ctx, back) => {
-    return Markup.keyboard([
-        back ? [ctx.i18n.t('buttons.back')] : [ctx.i18n.t('buttons.cancel')]
-    ]).resize().extra()
-}
-
 const getFilesKeyboard = (ctx, back) => {
     return Markup.keyboard([
         [ctx.i18n.t('buttons.continue')],
         back ? [ctx.i18n.t('buttons.back')] : [ctx.i18n.t('buttons.cancel')]
     ]).resize().extra()
+}
+
+const getNavKeyboard = (ctx, buttons = ['cancel']) => {
+    const navButtons = {
+        continue: [ctx.i18n.t('buttons.continue')],
+        back: [ctx.i18n.t('buttons.back')],
+        cancel: [ctx.i18n.t('buttons.cancel')]
+    }
+    return Markup.keyboard(
+        buttons.reverse().map(button => {
+            if (button in navButtons) {
+                return navButtons[button]
+            }
+            throw new Error('Button not found')
+        })
+    ).resize().extra()
 }
 
 const getFormatsKeyboard = (ctx, back) => {
@@ -101,7 +118,7 @@ const getEditInlineKeyboard = ctx => {
         [Markup.callbackButton(ctx.i18n.t('inline.phone_number'), JSON.stringify({ ...edit, val: 'phone_number' }))],
         [Markup.callbackButton(ctx.i18n.t('inline.comments'), JSON.stringify({ ...edit, val: 'comments' }))],
         [Markup.callbackButton(ctx.i18n.t('inline.formats'), JSON.stringify({ ...edit, val: 'formats' }))],
-        [Markup.callbackButton(ctx.i18n.t('inline.email'), JSON.stringify({ ...edit, val: 'email' }))],
+        [Markup.callbackButton(ctx.i18n.t('inline.email'), JSON.stringify({ ...edit, val: 'emails' }))],
     ]).extra()
 }
 
@@ -120,7 +137,6 @@ module.exports = {
     getInfoInlineKeyboard,
     getNewOrderKeyboard,
     getCityKeyboard,
-    getCancelKeyboard,
     getFilesKeyboard,
     getFormatsKeyboard,
     getOrderReviewKeyboard,
@@ -128,5 +144,7 @@ module.exports = {
     getEditInlineKeyboard,
     getAuthURLInlineKeyboard,
     getEditLinksInlineKeyboard,
-    getTimeoutKeyboard
+    getTimeoutKeyboard,
+    getEmailInlineKeyboard,
+    getNavKeyboard
 }

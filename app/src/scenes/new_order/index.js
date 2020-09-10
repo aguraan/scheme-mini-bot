@@ -6,7 +6,6 @@ const { match } = require('telegraf-i18n')
 const scene = new Scene('new_order')
 
 scene.enter(async ctx => {
-
     await ctx.replyWithHTML(
         ctx.i18n.t('scenes.new_order.order_requirements'),
         getNewOrderKeyboard(ctx)

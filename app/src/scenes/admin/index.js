@@ -11,7 +11,7 @@ const {
 } = require('../../google')
 const { logWarn } = require('../../util/log')
 const json2html = require('../../util/json2html')
-const { exportURLStatsInHTML } = require('../../helpers')
+const { exportURLStatsInHTML, sending } = require('../../helpers')
 
 const scene = new Scene('admin')
 
@@ -31,6 +31,10 @@ scene.hears(match('buttons.auth'), async ctx => {
     }
 })
 
+scene.hears(match('buttons.get_file'), async ctx => {
+    await ctx.scene.enter('get_file')
+})
+
 scene.hears(match('buttons.export'), async ctx => {
     try {
         await ctx.replyWithHTML(ctx.i18n.t('other.exporting'))
@@ -42,11 +46,13 @@ scene.hears(match('buttons.export'), async ctx => {
             }
             return item
         }))
-        await ctx.replyWithHTML(ctx.i18n.t('other.sending'))
-        await ctx.sendMail({
-            to: process.env.EMAIL_ADDRESS,
-            subject: `Экспорт пользователей из базы данных`,
-            html
+
+        await sending(ctx, async () => {
+            await ctx.sendMail({
+                to: process.env.EMAIL_ADDRESS,
+                subject: `Экспорт пользователей из базы данных`,
+                html
+            })
         })
         await ctx.replyWithHTML(ctx.i18n.t('other.sending_success'))
     } catch (error) {
@@ -64,11 +70,12 @@ scene.hears(match('buttons.url_stats'), async ctx => {
     try {
         await ctx.replyWithHTML(ctx.i18n.t('other.exporting'))
         const html = await exportURLStatsInHTML(ctx)
-        await ctx.replyWithHTML(ctx.i18n.t('other.sending'))
-        await ctx.sendMail({
-            to: process.env.EMAIL_ADDRESS,
-            subject: `Статистика по ссылкам`,
-            html
+        await sending(ctx, async () => {
+            await ctx.sendMail({
+                to: process.env.EMAIL_ADDRESS,
+                subject: `Статистика по ссылкам`,
+                html
+            })
         })
         await ctx.replyWithHTML(ctx.i18n.t('other.sending_success'))
     } catch (error) {

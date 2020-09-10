@@ -1,6 +1,6 @@
 const Scene = require('telegraf/scenes/base')
 const { match } = require('telegraf-i18n')
-const { getCancelKeyboard } = require('../keyboards')
+const { getNavKeyboard } = require('../keyboards')
 
 const scene = new Scene('edit_link')
 
@@ -12,7 +12,7 @@ scene.enter(async ctx => {
         const text = ctx.i18n.t('other.edit_links_current', {
             current_link: href
         })
-        await ctx.replyWithHTML(text, getCancelKeyboard(ctx, 'back'))
+        await ctx.replyWithHTML(text, getNavKeyboard(ctx, ['back']))
     } else {
         await ctx.replyWithHTML('other.edit_links_not_found')
     }

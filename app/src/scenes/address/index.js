@@ -1,6 +1,6 @@
 const Scene = require('telegraf/scenes/base')
 const { match } = require('telegraf-i18n')
-const { getCancelKeyboard } = require('../keyboards')
+const { getNavKeyboard } = require('../keyboards')
 const { nextScene } = require('../../helpers')
 const { reverseGeocode } = require('../../google')
 
@@ -8,7 +8,7 @@ const scene = new Scene('address')
 
 scene.enter(async ctx => {
     const { address } = ctx.session.form
-    const keyboard = getCancelKeyboard(ctx, !!address)
+    const keyboard = getNavKeyboard(ctx, address ? ['back'] : ['cancel'])
     await ctx.replyWithHTML(ctx.i18n.t('scenes.new_order.address'), keyboard)
 })
 
