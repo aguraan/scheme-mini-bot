@@ -167,28 +167,29 @@ const bytesToReadableValue = bytes => {
 
 const sending = (ctx, func) => {
     return new Promise(async (resolve, reject) => {
+        let i = 0
+        const step = () => {
+            const progress = [
+                '— 📩💨 💨 💨',
+                '— 📩        ',
+                '— 📩💨      ',
+                '— 📩💨 💨   ',
+            ]
+            return progress[i++ % 4]
+        }
         try {
-            const message = await ctx.reply('— 📩💨 💨 💨')
+            const message = await ctx.reply(step())
             const { message_id } = message
-            let i = 3
-            const step = () => {
-                i++
-                const progress = [
-                    '— 📩        ',
-                    '— 📩💨      ',
-                    '— 📩💨 💨   ',
-                    '— 📩💨 💨 💨'
-                ]
-                return progress[i % 4]
-            }
-            let timerId = setInterval(async () => {
-                await ctx.tg.editMessageText(ctx.chat.id, message_id, null, step())
+            console.log({message})
+            let timerId = setInterval(() => {
+                ctx.tg.editMessageText(ctx.chat.id, message_id, null, step())
             }, 500)
             
             await func()
 
             clearInterval(timerId)
             timerId = null
+            console.log({message_id})
             await ctx.deleteMessage(message_id)
             resolve()
         } catch (error) {
