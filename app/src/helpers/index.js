@@ -178,8 +178,8 @@ const sending = async (ctx, func) => {
     }
     console.log('client_message',ctx.message)
     const message = await ctx.reply(step())
-    const { message_id } = message
-    console.log({message})
+    const message_id = message.message_id || +ctx.message.message_id + 1
+
     let timerId = null
     if (message_id) {
         timerId = setInterval(async () => {
