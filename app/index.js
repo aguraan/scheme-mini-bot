@@ -26,13 +26,14 @@ if (process.env.NODE_ENV === 'production') {
     // console.log({tlsOptions})
 
     bot.telegram.setWebhook(process.env.WEB_HOOKS_SECRET_URL)
-    .then(() => {
+    .then((data) => {
+        console.log({data})
+        bot.startWebhook(process.env.WEB_HOOKS_PATH, null, process.env.PORT)
         bot.telegram.getWebhookInfo()
         .then(info => {
             console.log({info})
         })
     })
-    bot.startWebhook(process.env.WEB_HOOKS_PATH, null, process.env.PORT)
 
     
 

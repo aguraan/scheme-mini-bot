@@ -186,7 +186,7 @@ const sending = async (ctx, func) => {
             await ctx.tg.editMessageText(ctx.chat.id, message_id, null, step())
         }, 500)
     }
-    await func()
+    await func(ctx)
     clearInterval(timerId)
     timerId = null
     console.log({message_id})

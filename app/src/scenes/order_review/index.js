@@ -82,7 +82,7 @@ scene.hears(match('buttons.send'), async ctx => {
     const recipients = [EMAIL_ADDRESS, ...emails].join(',')
     const subject = ctx.i18n.t('other.new_order_subject', { city, address })
     try {
-        await sending(ctx, async () => {
+        await sending(ctx, async ctx => {
             await ctx.sendMail({
                 to: recipients,
                 subject,
