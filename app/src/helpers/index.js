@@ -178,7 +178,7 @@ const sending = (ctx, func) => {
             return progress[i++ % 4]
         }
         try {
-            const message = await ctx.reply(step())
+            const message = await ctx.tg.sendMessage(ctx.chat.id, step())
             const { message_id } = message
             console.log({message})
             let timerId = setInterval(() => {
