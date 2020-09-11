@@ -38,7 +38,7 @@ scene.enter(async ctx => {
 scene.hears(match('buttons.new_order'), async ctx => {
     ctx.session.form = new Form()
     ctx.session.form.once('timeout', async () => {
-        ctx.replyWithHTML(ctx.i18n.t('other.timeout_msg'), getTimeoutKeyboard(ctx))
+        await ctx.replyWithHTML(ctx.i18n.t('other.timeout_msg'), getTimeoutKeyboard(ctx))
         const user = await ctx.db.users.findById(ctx.from.id)
         if (user && !user.can) { // can't send orders
             sendNotification('form_timeout', ctx)

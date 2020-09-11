@@ -18,6 +18,7 @@ const orderReviewScene = require('../scenes/order_review')
 const adminScene = require('../scenes/admin')
 const editLinkScene = require('../scenes/edit_link')
 const getFileScene = require('../scenes/get_file')
+const { compose } = require('telegraf/stage')
 
 const composer = new Composer()
 
@@ -55,6 +56,11 @@ const i18n = new TelegrafI18n({
 composer.use(session())
 composer.use(i18n.middleware())
 composer.use(stage.middleware())
+compose.use(async (ctx, next) => {
+    const info = await ctx.tg.getWebhookInfo()
+    console.log(ctx.message.text,{info})
+    await next()
+})
 
 composer.on('callback_query', async ctx => {
     const data = JSON.parse(ctx.update.callback_query.data)
