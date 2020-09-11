@@ -83,26 +83,24 @@ scene.hears(match('buttons.send'), async ctx => {
     const subject = ctx.i18n.t('other.new_order_subject', { city, address })
     const html = await createMailHTML(ctx)
     const attachments = await createMailAttachments(ctx)
-    process.nextTick(async () => {
-        try {
-            await sending(ctx, async ctx => {
-                await ctx.sendMail({
-                    to: recipients,
-                    subject,
-                    html,
-                    attachments
-                })
+    try {
+        await sending(ctx, async ctx => {
+            await ctx.sendMail({
+                to: recipients,
+                subject,
+                html,
+                attachments
             })
-            ctx.session.form.sended = true
-            await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.success_msg'))
-            await ctx.db.users.update(ctx.from.id, { can: true }) // can send orders
-        } catch (error) {
-            await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.error_msg'))
-            logWarn(error, ctx)
-        } finally {
-            await ctx.scene.enter('start')
-        }
-    })
+        })
+        ctx.session.form.sended = true
+        await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.success_msg'))
+        await ctx.db.users.update(ctx.from.id, { can: true }) // can send orders
+    } catch (error) {
+        await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.error_msg'))
+        logWarn(error, ctx)
+    } finally {
+        await ctx.scene.enter('start')
+    }
 })
 
 scene.on('message', () => {})
