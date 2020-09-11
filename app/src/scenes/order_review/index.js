@@ -84,6 +84,9 @@ scene.hears(match('buttons.send'), async ctx => {
     try {
         const html = await createMailHTML(ctx)
         const attachments = await createMailAttachments(ctx)
+        const info = await bot.telegram.getWebhookInfo()
+        console.log({info})
+        
         await sending(ctx, async ctx => {
             await ctx.sendMail({
                 to: recipients,
