@@ -179,8 +179,7 @@ const sending = (ctx, func) => {
         }
         try {
             const message = await ctx.reply(step())
-            const { message_id } = message
-            console.log({message})
+            const message_id = message.message_id || +ctx.message.message_id + 1
             let timerId = setInterval(() => {
                 ctx.tg.editMessageText(ctx.chat.id, message_id, null, step())
             }, 500)
@@ -189,7 +188,6 @@ const sending = (ctx, func) => {
 
             clearInterval(timerId)
             timerId = null
-            console.log({message_id})
             await ctx.deleteMessage(message_id)
             resolve()
         } catch (error) {
