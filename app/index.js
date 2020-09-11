@@ -1,6 +1,7 @@
 require('dotenv').config()
 const { logError } = require('./src/util/log')
 const bot = require('./src/bot')
+const fs = require('fs')
 
 bot.use(require('./src/middlewares'))
 
@@ -19,9 +20,15 @@ if (process.env.NODE_ENV === 'production') {
 
     console.info('Bot launched. mode: Webhook-Docker')
 } else {
+    const cert = fs.readFileSync('/etc/letsencrypt/live/scheme.com.ua/cert.pem')
+    const key = fs.readFileSync('/etc/letsencrypt/live/scheme.com.ua/privkey.pem')
+    const tlsOptions = { key, cert, ca: [ cert ] }
+    console.log({tlsOptions})
 
-    bot.telegram.setWebhook(process.env.WEB_HOOKS_SECRET_URL)
-    bot.startWebhook(process.env.WEB_HOOKS_PATH, null, process.env.PORT)
+    bot.telegram.setWebhook(process.env.WEB_HOOKS_SECRET_URL, {
+        source: cert
+    })
+    bot.startWebhook(process.env.WEB_HOOKS_PATH, tlsOptions, process.env.PORT)
 
     bot.telegram.getWebhookInfo()
         .then(info => {
