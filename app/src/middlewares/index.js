@@ -56,7 +56,7 @@ const i18n = new TelegrafI18n({
 composer.use(session())
 composer.use(i18n.middleware())
 composer.use(stage.middleware())
-compose.use(async (ctx, next) => {
+composer.use(async (ctx, next) => {
     const info = await ctx.tg.getWebhookInfo()
     console.log(ctx.message.text,{info})
     await next()
