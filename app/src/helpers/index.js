@@ -165,7 +165,7 @@ const bytesToReadableValue = bytes => {
     return ''
 }
 
-const sending = (ctx, func) => {
+const sending = async (ctx, func) => {
     let i = 0
     const step = () => {
         const progress = [
@@ -176,29 +176,22 @@ const sending = (ctx, func) => {
         ]
         return progress[i++ % 4]
     }
-    return new Promise((resolve, reject) => {
-        process.nextTick(async () => {
-            try {
-                const message = await ctx.reply(step())
-                const { message_id } = message
-                console.log({message})
-                let timerId = null
-                if (message_id) {
-                    timerId = setInterval(async () => {
-                        await ctx.tg.editMessageText(ctx.chat.id, message_id, null, step())
-                    }, 500)
-                }
-                await func(ctx)
-                clearInterval(timerId)
-                timerId = null
-                console.log({message_id})
-                if (message_id) await ctx.deleteMessage(message_id)
-                resolve()
-            } catch (error) {
-                reject(error)
-            }
-        })
-    })
+    console.log('client_message',ctx.message)
+    const message = await ctx.reply(step())
+    const { message_id } = message
+    console.log({message})
+    let timerId = null
+    if (message_id) {
+        timerId = setInterval(async () => {
+            await ctx.tg.editMessageText(ctx.chat.id, message_id, null, step())
+        }, 500)
+    }
+    await func(ctx)
+    clearInterval(timerId)
+    timerId = null
+    console.log({message_id})
+    if (message_id)
+        await ctx.deleteMessage(message_id)
 }
 
 module.exports = {

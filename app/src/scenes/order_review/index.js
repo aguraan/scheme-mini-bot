@@ -83,8 +83,10 @@ scene.hears(match('buttons.send'), async ctx => {
     const subject = ctx.i18n.t('other.new_order_subject', { city, address })
     const html = await createMailHTML(ctx)
     const attachments = await createMailAttachments(ctx)
+    const {pending_update_count} = await ctx.tg.getWebhookInfo()
+    console.log('beforeEnter',{pending_update_count})
     try {
-        await sending(ctx, async ctx => {
+        await sending(ctx, async () => {
             await ctx.sendMail({
                 to: recipients,
                 subject,
