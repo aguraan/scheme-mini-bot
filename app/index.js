@@ -32,7 +32,7 @@ if (process.env.NODE_ENV === 'production') {
             console.log({info})
         })
     })
-    bot.startWebhook(process.env.WEB_HOOKS_PATH, null, process.env.PORT, 'localhost')
+    bot.startWebhook(process.env.WEB_HOOKS_PATH, null, process.env.PORT)
 
     
 
