@@ -176,6 +176,7 @@ const sending = async (ctx, func) => {
         ]
         return progress[i++ % 4]
     }
+    console.log('client_message',ctx.message)
     const message = await ctx.reply(step())
     const { message_id } = message
     console.log({message})
