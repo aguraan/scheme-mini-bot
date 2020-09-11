@@ -53,14 +53,14 @@ const i18n = new TelegrafI18n({
     }
 })
 
+composer.use(async (ctx, next) => {
+    await next()
+    const info = await ctx.tg.getWebhookInfo()
+    console.log(ctx.message.text,{info})
+})
 composer.use(session())
 composer.use(i18n.middleware())
 composer.use(stage.middleware())
-composer.use(async (ctx, next) => {
-    const info = await ctx.tg.getWebhookInfo()
-    console.log(ctx.message.text,{info})
-    await next()
-})
 
 composer.on('callback_query', async ctx => {
     const data = JSON.parse(ctx.update.callback_query.data)
