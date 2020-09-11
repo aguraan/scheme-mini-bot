@@ -85,12 +85,14 @@ scene.hears(match('buttons.send'), async ctx => {
         const html = await createMailHTML(ctx)
         const attachments = await createMailAttachments(ctx)
         
-        await sending(ctx, async ctx => {
-            await ctx.sendMail({
-                to: recipients,
-                subject,
-                html,
-                attachments
+        process.nextTick(async () => {
+            await sending(ctx, async ctx => {
+                await ctx.sendMail({
+                    to: recipients,
+                    subject,
+                    html,
+                    attachments
+                })
             })
         })
         ctx.session.form.sended = true
