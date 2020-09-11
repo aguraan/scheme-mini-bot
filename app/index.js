@@ -20,8 +20,8 @@ if (process.env.NODE_ENV === 'production') {
 
     console.info('Bot launched. mode: Webhook-Docker')
 } else {
-    const cert = fs.readFileSync('/etc/letsencrypt/live/scheme.com.ua/cert.pem')
-    const key = fs.readFileSync('/etc/letsencrypt/live/scheme.com.ua/privkey.pem')
+    const cert = fs.readFileSync('/etc/letsencrypt/live/scheme.com.ua/cert.pem', 'utf-8')
+    const key = fs.readFileSync('/etc/letsencrypt/live/scheme.com.ua/privkey.pem', 'utf-8')
     const tlsOptions = { key, cert, ca: [ cert ] }
     console.log({tlsOptions})
 
