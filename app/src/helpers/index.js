@@ -179,22 +179,18 @@ const sending = async (ctx, func) => {
     const message = await ctx.reply(step())
     const { message_id } = message
     console.log({message})
-    let timerId = setInterval(async () => {
-        await ctx.tg.editMessageText(ctx.chat.id, message_id, null, step())
-    }, 500)
-
-    return new Promise(async (resolve, reject) => {
-        try {
-            await func()
-            clearInterval(timerId)
-            timerId = null
-            console.log({message_id})
-            await ctx.deleteMessage(message_id)
-            resolve()
-        } catch (error) {
-            reject(error)
-        }
-    })
+    let timerId = null
+    if (message_id) {
+        timerId = setInterval(async () => {
+            await ctx.tg.editMessageText(ctx.chat.id, message_id, null, step())
+        }, 500)
+    }
+    await func()
+    clearInterval(timerId)
+    timerId = null
+    console.log({message_id})
+    if (message_id)
+        await ctx.deleteMessage(message_id)
 }
 
 module.exports = {
