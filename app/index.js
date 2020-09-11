@@ -17,10 +17,16 @@ if (process.env.NODE_ENV === 'production') {
             console.log({info})
         })
 
-    console.info('Bot launched. mode: Webhook')
+    console.info('Bot launched. mode: Webhook-Docker')
 } else {
 
-    bot.launch()
+    bot.telegram.setWebhook(process.env.WEB_HOOKS_SECRET_URL)
+    bot.startWebhook(process.env.WEB_HOOKS_PATH, null, process.env.PORT)
 
-    console.info('Bot launched. mode: long-polling')
+    bot.telegram.getWebhookInfo()
+        .then(info => {
+            console.log({info})
+        })
+
+    console.info('Bot launched. mode: Webhook-Dev')
 }
