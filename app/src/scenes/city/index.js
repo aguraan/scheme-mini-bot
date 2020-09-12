@@ -18,8 +18,12 @@ scene.hears(match('buttons.cancel'), async ctx => await ctx.scene.enter('start')
 
 scene.on('text', async ctx => {
     const answer = ctx.message.text.trim()
-    ctx.session.form.city = answer
-    await nextScene(ctx)
+    if (/[0-9]/.test(answer)) {
+        await ctx.replyWithHTML(ctx.i18n.t('validation.city'))
+    } else {
+        ctx.session.form.city = answer
+        await nextScene(ctx)
+    }
 })
 
 scene.on('message', async ctx => {

@@ -24,13 +24,18 @@ scene.on('contact', async ctx => {
 
 scene.on('text', async ctx => {
     const answer = ctx.message.text.trim()
-    const validPhoneNumber = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/i.test(answer)
+    const normalized = answer.replace(/[()\s-]/g, '')
+    const validPhoneNumber = /^\+?3?8?(0\d{9})$/.test(normalized)
     if (validPhoneNumber) {
         ctx.session.form.phone_number = answer
         await nextScene(ctx)
     } else {
         await ctx.replyWithHTML(ctx.i18n.t('validation.phone_number'))
     }
+})
+
+scene.on('message', async ctx => {
+    await ctx.replyWithHTML(ctx.i18n.t('validation.phone_number'))
 })
 
 module.exports = scene

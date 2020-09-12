@@ -14,48 +14,51 @@ const {
 } = require('../../helpers')
 const { EMAIL_ADDRESS } = process.env
 const { logWarn } = require('../../util/log')
+const { forEachAsync } = require('../../util')
 
 const scene = new Scene('order_review')
 
 scene.enter(async ctx => {
     const { form } = ctx.session
     const html = ctx.i18n.t('scenes.order_review.result', form)
-    await Promise.all(
+    Promise.all(
         form.files
             .map(async (file, i) => {
                 const data = { i }
                 const extra = { caption:  `${ctx.i18n.t('other.file_size')}: ${ bytesToReadableValue(file.size) }`}
                 if (file.type === 'photo') {
-                    return ctx.replyWithPhoto(file.id,
+                    return await ctx.replyWithPhoto(file.id,
                         getDeleteInlineKeyboard(ctx, data, extra)
                     )
                 }
                 if (file.type === 'document') {
-                    return ctx.replyWithDocument(file.id,
+                    return await ctx.replyWithDocument(file.id,
                         getDeleteInlineKeyboard(ctx, data, extra)
                     )
                 }
                 if (file.type === 'audio') {
-                    return ctx.replyWithAudio(file.id,
+                    return await ctx.replyWithAudio(file.id,
                         getDeleteInlineKeyboard(ctx, data, extra)
                     )
                 }
                 if (file.type === 'voice') {
-                    return ctx.replyWithVoice(file.id,
+                    return await ctx.replyWithVoice(file.id,
                         getDeleteInlineKeyboard(ctx, data, extra)
                     )
                 }
                 if (file.type === 'video') {
-                    return ctx.replyWithVideo(file.id,
+                    return await ctx.replyWithVideo(file.id,
                         getDeleteInlineKeyboard(ctx, data, extra)
                     )
                 }
             })
     )
-    await ctx.replyWithHTML(html, getOrderReviewKeyboard(ctx))
-    if (!isFileSizeSumLess20MB(form.files)) {
-        await ctx.replyWithHTML(ctx.i18n.t('validation.file_size'))
-    }
+    .then(async () => {
+        await ctx.replyWithHTML(html, getOrderReviewKeyboard(ctx))
+        if (!isFileSizeSumLess20MB(form.files)) {
+            await ctx.replyWithHTML(ctx.i18n.t('validation.file_size'))
+        }
+    })
 })
 
 scene.command('start', async ctx => await ctx.scene.enter('start'))

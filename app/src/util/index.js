@@ -5,6 +5,21 @@ const isEmpty = obj => {
     return true
 }
 
+const forEachAsync = (arr, func) => {
+    if (Array.isArray(arr)) {
+        const { length } = arr
+        if (length) {
+            let i = 0
+            const cb = () => {
+                if (i < length)
+                    func(arr[i], i++, arr, cb)
+            }
+            cb()
+        }
+    }
+}
+
 module.exports = {
-    isEmpty
+    isEmpty,
+    forEachAsync
 }
