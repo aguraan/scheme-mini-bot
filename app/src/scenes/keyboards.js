@@ -54,14 +54,14 @@ const getNewOrderKeyboard = ctx => {
 const getCityKeyboard = (ctx, back) => {
     return Markup.keyboard([
         [ctx.i18n.t('buttons.kiev'), ctx.i18n.t('buttons.odessa')],
-        back ? [ctx.i18n.t('buttons.back')] : [ctx.i18n.t('buttons.cancel')]
+        back ? [ctx.i18n.t('buttons.back')] : [ctx.i18n.t('buttons.cancel_order')]
     ]).resize().extra()
 }
 
 const getFilesKeyboard = (ctx, back) => {
     return Markup.keyboard([
         [ctx.i18n.t('buttons.continue')],
-        back ? [ctx.i18n.t('buttons.back')] : [ctx.i18n.t('buttons.cancel')]
+        back ? [ctx.i18n.t('buttons.back')] : [ctx.i18n.t('buttons.cancel_order')]
     ]).resize().extra()
 }
 
@@ -69,7 +69,8 @@ const getNavKeyboard = (ctx, buttons = ['cancel']) => {
     const navButtons = {
         continue: [ctx.i18n.t('buttons.continue')],
         back: [ctx.i18n.t('buttons.back')],
-        cancel: [ctx.i18n.t('buttons.cancel')]
+        cancel: [ctx.i18n.t('buttons.cancel')],
+        cancel_order: [ctx.i18n.t('buttons.cancel_order')]
     }
     return Markup.keyboard(
         buttons.reverse().map(button => {
@@ -86,7 +87,7 @@ const getFormatsKeyboard = (ctx, back) => {
         [ctx.i18n.t('buttons.not_needed')],
         [ctx.i18n.t('buttons.b3d'), ctx.i18n.t('buttons.pdf')],
         [ctx.i18n.t('buttons.b3d_pdf')],
-        back ? [ctx.i18n.t('buttons.back')] : [ctx.i18n.t('buttons.cancel')]
+        back ? [ctx.i18n.t('buttons.back')] : [ctx.i18n.t('buttons.cancel_order')]
     ]
     return Markup.keyboard(kb).resize().extra()
 }
@@ -95,7 +96,7 @@ const getOrderReviewKeyboard = ctx => {
     return Markup.keyboard([
         [ctx.i18n.t('buttons.send')],
         [ctx.i18n.t('buttons.add_files')],
-        [ctx.i18n.t('buttons.cancel'), ctx.i18n.t('buttons.edit')]
+        [ctx.i18n.t('buttons.cancel_order'), ctx.i18n.t('buttons.edit')]
     ]).resize().extra()
 }
 

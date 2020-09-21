@@ -14,7 +14,10 @@ const {
 } = require('../../helpers')
 const { EMAIL_ADDRESS } = process.env
 const { logWarn } = require('../../util/log')
-const { forEachAsync } = require('../../util')
+const {
+    Loading,
+    mailAnimation
+} = require('../../helpers/loading')
 
 const scene = new Scene('order_review')
 
@@ -63,7 +66,7 @@ scene.enter(async ctx => {
 
 scene.command('start', async ctx => await ctx.scene.enter('start'))
 
-scene.hears(match('buttons.cancel'), ctx => ctx.scene.enter('start'))
+scene.hears(match('buttons.cancel_order'), ctx => ctx.scene.enter('start'))
 
 scene.hears(match('buttons.add_files'), ctx => ctx.scene.enter('files'))
 
@@ -77,22 +80,31 @@ scene.hears(match('buttons.edit'), async ctx => {
 scene.hears(match('buttons.send'), async ctx => {
     const { city, address, emails } = ctx.session.form
     if (!emails.length) {
-        return await ctx.scene.enter('emails')
+        return ctx.scene.enter('emails')
     }
     if (!isFileSizeSumLess20MB(ctx.session.form.files)) {
-        return await ctx.replyWithHTML(ctx.i18n.t('validation.file_size'))
+        return ctx.replyWithHTML(ctx.i18n.t('validation.file_size'))
     }
     const recipients = [EMAIL_ADDRESS, ...emails].join(',')
     const subject = ctx.i18n.t('other.new_order_subject', { city, address })
+    const loading = new Loading(mailAnimation)
     try {
-        await sending(ctx, async () => {
-            await ctx.sendMail({
-                to: recipients,
-                subject,
-                html: await createMailHTML(ctx),
-                attachments: await createMailAttachments(ctx)
-            })
+        await loading.start(ctx)
+        await ctx.sendMail({
+            to: recipients,
+            subject,
+            html: await createMailHTML(ctx),
+            attachments: await createMailAttachments(ctx)
         })
+        await loading.end(ctx)
+        // await sending(ctx, async () => {
+        //     await ctx.sendMail({
+        //         to: recipients,
+        //         subject,
+        //         html: await createMailHTML(ctx),
+        //         attachments: await createMailAttachments(ctx)
+        //     })
+        // })
         ctx.session.form.sended = true
         await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.success_msg'))
         await ctx.db.users.update(ctx.from.id, { can: true }) // can send orders

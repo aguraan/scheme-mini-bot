@@ -21,7 +21,7 @@ scene.hears(match('buttons.continue'), async ctx => {
 })
 
 scene.hears(match('buttons.back'), async ctx => await nextScene(ctx))
-scene.hears(match('buttons.cancel'), async ctx => await ctx.scene.enter('start'))
+scene.hears(match('buttons.cancel_order'), async ctx => await ctx.scene.enter('start'))
 
 scene.on('photo', ctx => {
     const { photo } = ctx.message
@@ -37,7 +37,7 @@ scene.on('photo', ctx => {
 
 scene.on('document', ctx => {
     const { document } = ctx.message
-    const { file_id, file_name, file_size, file_unique_id } = document
+    const { file_id, file_name, file_size } = document
     const { form } = ctx.session
     if (!form.files) form.files = []
     form.files.push({

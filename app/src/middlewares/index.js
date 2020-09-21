@@ -83,6 +83,73 @@ composer.on('callback_query', async ctx => {
     }
 })
 composer.start(async ctx => await ctx.scene.enter('start'))
+// composer.on('photo', ctx => {
+//     const { form } = ctx.session
+//     if (!form) return
+//     const { photo } = ctx.message
+//     const { file_id, file_size } = photo[photo.length-1]
+//     if (!form.files) form.files = []
+//     form.files.push({
+//         type: 'photo',
+//         id: file_id,
+//         size: file_size
+//     })
+// })
+
+// composer.on('document', ctx => {
+//     const { form } = ctx.session
+//     console.log(1,{form})
+//     if (!form) return
+//     const { document } = ctx.message
+//     const { file_id, file_name, file_size } = document
+//     if (!form.files) form.files = []
+//     form.files.push({
+//         type: 'document',
+//         id: file_id,
+//         filename: file_name,
+//         size: file_size
+//     })
+//     console.log(2,{form})
+// })
+
+// composer.on('audio', ctx => {
+//     const { form } = ctx.session
+//     if (!form) return
+//     const { audio } = ctx.message
+//     const { file_id, file_size } = audio
+//     if (!form.files) form.files = []
+//     form.files.push({
+//         type: 'audio',
+//         id: file_id,
+//         size: file_size
+//     })
+// })
+
+// composer.on('video', ctx => {
+//     const { form } = ctx.session
+//     if (!form) return
+//     const { video } = ctx.message
+//     const { file_id, file_size } = video
+//     if (!form.files) form.files = []
+//     form.files.push({
+//         type: 'video',
+//         id: file_id,
+//         size: file_size
+//     })
+// })
+
+// composer.on('voice', ctx => {
+//     const { form } = ctx.session
+//     if (!form) return
+//     const { voice } = ctx.message
+//     const { file_id, file_size } = voice
+//     if (!form.files) form.files = []
+//     form.files.push({
+//         type: 'voice',
+//         id: file_id,
+//         size: file_size
+//     })
+// })
 composer.on('message', async ctx => {
     await ctx.replyWithHTML(ctx.i18n.t('scenes.start.restart'))
 })

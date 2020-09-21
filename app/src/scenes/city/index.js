@@ -14,7 +14,7 @@ scene.enter(async ctx => {
 scene.command('start', async ctx => await ctx.scene.enter('start'))
 
 scene.hears(match('buttons.back'), async ctx => await nextScene(ctx))
-scene.hears(match('buttons.cancel'), async ctx => await ctx.scene.enter('start'))
+scene.hears(match('buttons.cancel_order'), async ctx => await ctx.scene.enter('start'))
 
 scene.on('text', async ctx => {
     const answer = ctx.message.text.trim()

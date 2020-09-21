@@ -21,6 +21,16 @@ const nextScene = async ctx => {
     }
 }
 
+const toBase64 = obj => Buffer.from(JSON.stringify(obj)).toString('base64')
+const fromBase64 = str => {
+    const json = Buffer.from(str, 'base64').toString()
+    try {
+        return JSON.parse(json)
+    } catch (error) {
+        return null
+    }
+}
+
 const createMailHTML = async ctx => {
     const { form } = ctx.session
     const filename = ctx.i18n.locale() + '_mail.html'
@@ -38,10 +48,10 @@ const createMailAttachments = async ctx => {
             try {
                 res.path = await ctx.tg.getFileLink(file.id)
             } catch (error) {
-                const content = Buffer.from(JSON.stringify(file)).toString('base64')
+                logWarn(error, ctx)
                 return {
                     filename: `bad_file${ i + 1 }.txt`,
-                    content
+                    content: toBase64(file)
                 }
             }
             if (file.type === 'document') {
@@ -205,5 +215,7 @@ module.exports = {
     exportURLStatsInHTML,
     isFileSizeSumLess20MB,
     bytesToReadableValue,
-    sending
+    sending,
+    toBase64,
+    fromBase64
 }

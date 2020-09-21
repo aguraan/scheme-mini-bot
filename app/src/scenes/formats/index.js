@@ -15,7 +15,7 @@ scene.enter(async ctx => {
 scene.command('start', async ctx => await ctx.scene.enter('start'))
 
 scene.hears(match('buttons.back'), async ctx => await nextScene(ctx))
-scene.hears(match('buttons.cancel'), async ctx => await ctx.scene.enter('start'))
+scene.hears(match('buttons.cancel_order'), async ctx => await ctx.scene.enter('start'))
 
 scene.hears(match('buttons.not_needed'), async ctx => {
     ctx.session.form.formats = defaultFormats

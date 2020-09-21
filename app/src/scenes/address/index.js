@@ -8,12 +8,12 @@ const scene = new Scene('address')
 
 scene.enter(async ctx => {
     const { address } = ctx.session.form
-    const keyboard = getNavKeyboard(ctx, address ? ['back'] : ['cancel'])
+    const keyboard = getNavKeyboard(ctx, address ? ['back'] : ['cancel_order'])
     await ctx.replyWithHTML(ctx.i18n.t('scenes.new_order.address'), keyboard)
 })
 
 scene.hears(match('buttons.back'), async ctx => await nextScene(ctx))
-scene.hears(match('buttons.cancel'), async ctx => await ctx.scene.enter('start'))
+scene.hears(match('buttons.cancel_order'), async ctx => await ctx.scene.enter('start'))
 
 scene.on('location', async ctx => {
     const location = await reverseGeocode(ctx.message.location)

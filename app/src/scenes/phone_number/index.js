@@ -7,14 +7,14 @@ const scene = new Scene('phone_number')
 
 scene.enter(async ctx => {
     const { phone_number } = ctx.session.form
-    const keyboard = getNavKeyboard(ctx, phone_number ? ['back'] : ['cancel'])
+    const keyboard = getNavKeyboard(ctx, phone_number ? ['back'] : ['cancel_order'])
     await ctx.replyWithHTML(ctx.i18n.t('scenes.new_order.phone_number'), keyboard)
 })
 
 scene.command('start', async ctx => await ctx.scene.enter('start'))
 
 scene.hears(match('buttons.back'), async ctx => await nextScene(ctx))
-scene.hears(match('buttons.cancel'), async ctx => await ctx.scene.enter('start'))
+scene.hears(match('buttons.cancel_order'), async ctx => await ctx.scene.enter('start'))
 
 scene.on('contact', async ctx => {
     const { phone_number } = ctx.message.contact

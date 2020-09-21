@@ -3,12 +3,16 @@ const { match } = require('telegraf-i18n')
 const { getEmailInlineKeyboard, getNavKeyboard } = require('../keyboards')
 const { nextScene } = require('../../helpers')
 const EmailValidator = require('email-deep-validator')
+const {
+    Loading,
+    waitingAnimation
+} = require('../../helpers/loading')
 
 const scene = new Scene('emails')
 
 scene.enter(async ctx => {
     const { emails } = ctx.session.form
-    const keyboard = getNavKeyboard(ctx, emails ? ['back'] : ['cancel'])
+    const keyboard = getNavKeyboard(ctx, emails ? ['back'] : ['cancel_order'])
     await ctx.replyWithHTML(ctx.i18n.t('scenes.new_order.email'), keyboard)
     if (emails) {
         await Promise.all(
@@ -27,7 +31,7 @@ scene.hears(match('buttons.back'), async ctx => {
         await nextScene(ctx)
     }
 })
-scene.hears(match('buttons.cancel'), async ctx => await ctx.scene.enter('start'))
+scene.hears(match('buttons.cancel_order'), async ctx => await ctx.scene.enter('start'))
 
 scene.on('text', async ctx => {
     const answer = ctx.message.text
@@ -42,8 +46,11 @@ scene.on('text', async ctx => {
     if ((emails.length + existingLength) > 3) return await ctx.replyWithHTML(ctx.i18n.t('validation.max_emails'))
 
     const emailValidator = new EmailValidator()
-    ctx.replyWithChatAction('typing')
+    const loading = new Loading(waitingAnimation)
+    await ctx.replyWithChatAction('typing')
+    await loading.start(ctx)
     const results = await Promise.all(emails.map(email => emailValidator.verify(email)))
+    await loading.end(ctx)
     const validatedEmails = results.map(({ wellFormed, validDomain }, i) => {
             return {
                 email: emails[i],
