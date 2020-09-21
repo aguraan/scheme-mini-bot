@@ -1,4 +1,3 @@
-const animations = require('./animations')
 class Loading {
     #animation
     #i = 0

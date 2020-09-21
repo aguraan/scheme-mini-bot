@@ -1,4 +1,4 @@
-const mailAnimation = [
+const sendingAnimation = [
     '— 📩💨 💨 💨',
     '— 📩        ',
     '— 📩💨      ',
@@ -24,7 +24,7 @@ const waitingAnimation = [
 ]
 
 module.exports = {
-    mailAnimation,
+    sendingAnimation,
     clockAnimation,
     waitingAnimation
 }

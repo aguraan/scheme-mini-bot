@@ -12,6 +12,7 @@ const {
 const { logWarn } = require('../../util/log')
 const json2html = require('../../util/json2html')
 const { exportURLStatsInHTML, sending } = require('../../helpers')
+const { Loading, sendingAnimation } = require('../../helpers/loading')
 
 const scene = new Scene('admin')
 
@@ -46,14 +47,14 @@ scene.hears(match('buttons.export'), async ctx => {
             }
             return item
         }))
-
-        await sending(ctx, async () => {
-            await ctx.sendMail({
-                to: process.env.EMAIL_ADDRESS,
-                subject: `Экспорт пользователей из базы данных`,
-                html
-            })
+        const loading = new Loading(sendingAnimation)
+        await loading.start(ctx)
+        await ctx.sendMail({
+            to: process.env.EMAIL_ADDRESS,
+            subject: `Экспорт пользователей из базы данных`,
+            html
         })
+        await loading.end(ctx)
         await ctx.replyWithHTML(ctx.i18n.t('other.sending_success'))
     } catch (error) {
         await ctx.replyWithHTML(ctx.i18n.t('other.error'))
@@ -70,13 +71,14 @@ scene.hears(match('buttons.url_stats'), async ctx => {
     try {
         await ctx.replyWithHTML(ctx.i18n.t('other.exporting'))
         const html = await exportURLStatsInHTML(ctx)
-        await sending(ctx, async () => {
-            await ctx.sendMail({
-                to: process.env.EMAIL_ADDRESS,
-                subject: `Статистика по ссылкам`,
-                html
-            })
+        const loading = new Loading(sendingAnimation)
+        await loading.start(ctx)
+        await ctx.sendMail({
+            to: process.env.EMAIL_ADDRESS,
+            subject: `Статистика по ссылкам`,
+            html
         })
+        await loading.end(ctx)
         await ctx.replyWithHTML(ctx.i18n.t('other.sending_success'))
     } catch (error) {
         await ctx.replyWithHTML(ctx.i18n.t('other.error'))

@@ -5,7 +5,7 @@ const { nextScene } = require('../../helpers')
 const EmailValidator = require('email-deep-validator')
 const {
     Loading,
-    waitingAnimation
+    clockAnimation
 } = require('../../helpers/loading')
 
 const scene = new Scene('emails')
@@ -46,7 +46,7 @@ scene.on('text', async ctx => {
     if ((emails.length + existingLength) > 3) return await ctx.replyWithHTML(ctx.i18n.t('validation.max_emails'))
 
     const emailValidator = new EmailValidator()
-    const loading = new Loading(waitingAnimation)
+    const loading = new Loading(clockAnimation)
     await ctx.replyWithChatAction('typing')
     await loading.start(ctx)
     const results = await Promise.all(emails.map(email => emailValidator.verify(email)))
