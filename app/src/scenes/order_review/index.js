@@ -120,12 +120,18 @@ scene.hears(match('buttons.send'), async ctx => {
     if (!isFileSizeSumLess20MB(ctx.session.form.files)) {
         return ctx.replyWithHTML(ctx.i18n.t('validation.file_size'))
     }
-    const recipients = [EMAIL_ADDRESS, ...emails].join(',')
+    const recipients = [EMAIL_ADDRESS, ...emails]
+    let bcc = undefined
+    if (ctx.i18n.t('buttons.odessa') === city) {
+        const emailGena = 'esset004@gmail.com';
+        bcc = emailGena
+    }
     const subject = ctx.i18n.t('other.new_order_subject', { city, address })
     try {
         await sending(ctx, async () => {
             await ctx.sendMail({
-                to: recipients,
+                to: recipients.join(','),
+                bcc,
                 subject,
                 html: await createMailHTML(ctx),
                 attachments: await createMailAttachments(ctx)
