@@ -12,7 +12,8 @@ scene.enter(async ctx => {
     if (comments) buttons.push('back')
     else buttons.push('cancel_order')
 
-    if (files && files.length) buttons.push('continue')
+    // if (files && files.length) buttons.push('continue')
+    buttons.push('continue')
 
     const keyboard = getNavKeyboard(ctx, buttons) 
     await ctx.replyWithHTML(ctx.i18n.t('scenes.new_order.comments'), keyboard)
@@ -22,15 +23,26 @@ scene.command('start', async ctx => await ctx.scene.enter('start'))
 
 scene.hears(match('buttons.back'), async ctx => await nextScene(ctx))
 scene.hears(match('buttons.continue'), async ctx => {
-    ctx.session.form.comments = '🍪'
-    await nextScene(ctx)
+    const { form } = ctx.session
+    const { files, comments } = form
+
+    if (comments) {
+        await nextScene(ctx)
+    } else if (files && files.length) {
+        form.comments = '🍪'
+        await nextScene(ctx)
+    } else {
+        await ctx.scene.reenter()
+    }
+
+    
 })
 scene.hears(match('buttons.cancel_order'), async ctx => await ctx.scene.enter('start'))
 
 scene.on('text', async ctx => {
     const answer = ctx.message.text.trim()
-    ctx.session.form.comments = answer
-    await nextScene(ctx)
+    ctx.session.form.comments += `${ answer }\n`
+    // await nextScene(ctx)
 })
 
 scene.on('message', async ctx => {

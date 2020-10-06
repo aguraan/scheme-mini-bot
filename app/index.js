@@ -4,7 +4,9 @@ const bot = require('./src/bot')
 
 bot.use(require('./src/middlewares'))
 
-bot.catch(logError)
+bot.catch(err => {
+    logError(err, bot.context)
+})
 
 
 if (process.env.NODE_ENV === 'production') {

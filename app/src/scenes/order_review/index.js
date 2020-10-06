@@ -56,9 +56,9 @@ scene.enter(async ctx => {
         }
     }
     await ctx.replyWithHTML(html, getOrderReviewKeyboard(ctx))
-    if (!isFileSizeSumLess20MB(form.files)) {
-        await ctx.replyWithHTML(ctx.i18n.t('validation.file_size'))
-    }
+    // if (!isFileSizeSumLess20MB(form.files)) {
+    //     await ctx.replyWithHTML(ctx.i18n.t('validation.file_size'))
+    // }
     // Promise.all(
     //     form.files
     //         .map(async (file, i) => {
@@ -117,9 +117,9 @@ scene.hears(match('buttons.send'), async ctx => {
     if (!emails.length) {
         return ctx.scene.enter('emails')
     }
-    if (!isFileSizeSumLess20MB(ctx.session.form.files)) {
-        return ctx.replyWithHTML(ctx.i18n.t('validation.file_size'))
-    }
+    // if (!isFileSizeSumLess20MB(ctx.session.form.files)) {
+    //     return ctx.replyWithHTML(ctx.i18n.t('validation.file_size'))
+    // }
     const recipients = [EMAIL_ADDRESS, ...emails]
     let bcc = undefined
     if (ctx.i18n.t('buttons.odessa') === city) {
@@ -138,7 +138,7 @@ scene.hears(match('buttons.send'), async ctx => {
             })
         })
         ctx.session.form.sended = true
-        await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.success_msg'))
+        await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.success_msg', { emails: emails.join('\n') }))
         await ctx.db.users.update(ctx.from.id, { can: true }) // can send orders
     } catch (error) {
         await ctx.replyWithHTML(ctx.i18n.t('scenes.order_review.error_msg'))
