@@ -1,6 +1,7 @@
 const Scene = require('telegraf/scenes/base')
 const { sendNotification, recordUrlClick } = require('../../helpers')
 const { match } = require('telegraf-i18n')
+const { nextScene } = require('../../helpers')
 const {
     getMainKeyboard,
     getInfoInlineKeyboard,
@@ -44,7 +45,8 @@ scene.hears(match('buttons.new_order'), async ctx => {
             sendNotification('form_timeout', ctx)
         }
     })
-    await ctx.scene.enter('new_order')
+    await nextScene(ctx)
+    // await ctx.scene.enter('new_order')
 })
 
 scene.hears(match('buttons.info'), async ctx => {

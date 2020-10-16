@@ -1,9 +1,5 @@
 const fs = require('fs')
 const json2html = require('../util/json2html')
-const {
-    isNullOrUndefined,
-    isObject
-} = require('util')
 
 module.exports = class Collection {
     constructor(path) {
@@ -32,12 +28,12 @@ module.exports = class Collection {
 
     find(query) {
         return new Promise((resolve, reject) => {
-            if (isNullOrUndefined(query)) {
+            if (query === null || query === undefined) {
                 this._read((err, coll) => {
                     if (err) return reject(err)
                     return resolve(coll)
                 })
-            } else if (isObject(query)) {
+            } else if (query !== null && typeof query === 'object') {
                 this._read((err, coll) => {
                     if (err) return reject(err)
                     const result = []
