@@ -35,9 +35,10 @@ scene.hears(match('buttons.auth'), async ctx => {
 
 scene.hears(match('buttons.reload_bot'), async ctx => {
     if (process.env.NODE_ENV === 'dev_webhook') {
-        await ctx.reply(JSON.stringify(bot.telegram.getWebhookInfo()))
+        const whInfo = await bot.telegram.getWebhookInfo()
+        await ctx.reply(JSON.stringify(whInfo))
 
-        if (bot.telegram.deleteWebhook()) {
+        if (await bot.telegram.deleteWebhook()) {
             bot.telegram.setWebhook(process.env.TEST_WEB_HOOKS_SECRET_URL)
             bot.startWebhook(process.env.TEST_WEB_HOOKS_PATH, null, process.env.TEST_PORT)
             await ctx.reply('Бот был успешно перезагружен.\n\n' + JSON.stringify(bot.telegram.getWebhookInfo()))
