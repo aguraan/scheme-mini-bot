@@ -2,6 +2,7 @@ const Scene = require('telegraf/scenes/base')
 const { sendNotification, recordUrlClick } = require('../../helpers')
 const { match } = require('telegraf-i18n')
 const { nextScene } = require('../../helpers')
+const store = require('../../session')
 const {
     getMainKeyboard,
     getInfoInlineKeyboard,
@@ -14,6 +15,7 @@ const scene = new Scene('start')
 
 scene.enter(async ctx => {
     await ctx.replyWithHTML(ctx.i18n.t('scenes.start.make_your_choice'), getMainKeyboard(ctx))
+    await ctx.reply(store.toString())
 
     let user = await ctx.db.users.findById(ctx.from.id)
     if (!user) {

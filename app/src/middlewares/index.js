@@ -3,6 +3,7 @@ const Stage = require('telegraf/stage')
 const session = require('telegraf/session')
 const TelegrafI18n = require('telegraf-i18n')
 const path = require('path')
+const store = require('../session')
 
 const startScene = require('../scenes/start')
 const newOrderScene = require('../scenes/new_order')
@@ -52,7 +53,7 @@ const i18n = new TelegrafI18n({
     }
 })
 
-composer.use(session())
+composer.use(session({ store }))
 composer.use(i18n.middleware())
 composer.use(stage.middleware())
 

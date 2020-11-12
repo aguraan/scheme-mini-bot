@@ -12,7 +12,7 @@ const {
 const { logWarn } = require('../../util/log')
 const json2html = require('../../util/json2html')
 const { exportURLStatsInHTML } = require('../../helpers')
-const { Loading, sendingAnimation } = require('../../helpers/loading')
+const { Loading, sendingAnimation, clockAnimation } = require('../../helpers/loading')
 const bot = require('../../bot')
 
 const scene = new Scene('admin')
@@ -35,17 +35,26 @@ scene.hears(match('buttons.auth'), async ctx => {
 
 scene.hears(match('buttons.reload_bot'), async ctx => {
     if (process.env.NODE_ENV === 'dev_webhook') {
-        const whInfo = await bot.telegram.getWebhookInfo()
-        await ctx.reply(JSON.stringify(whInfo))
+        const { pending_update_count } = await bot.telegram.getWebhookInfo()
+        await ctx.replyWithHTML(`<b>Перезагружаюсь...</b>\n\npending_update_count: ${ pending_update_count }`)
+        const loading = new Loading(clockAnimation)
+        await loading.start(ctx)
+        try {
+            const deleted = await bot.telegram.deleteWebhook(true)
+            if (deleted) {
+                await bot.stop()
 
-        if (await bot.telegram.deleteWebhook()) {
-            bot.telegram.setWebhook(process.env.TEST_WEB_HOOKS_SECRET_URL)
-            bot.startWebhook(process.env.TEST_WEB_HOOKS_PATH, null, process.env.TEST_PORT)
-            await ctx.reply('Бот был успешно перезагружен.\n\n' + JSON.stringify(bot.telegram.getWebhookInfo()))
+                bot.telegram.setWebhook(process.env.TEST_WEB_HOOKS_SECRET_URL)
+                await bot.startWebhook(process.env.TEST_WEB_HOOKS_PATH, null, process.env.TEST_PORT)
+                const { pending_update_count } = await bot.telegram.getWebhookInfo()
+                await loading.end(ctx)
+                await ctx.replyWithHTML(`<b>✅ Бот был успешно перезагружен.</b>\n\npending_update_count: ${ pending_update_count }`)
+
+                console.info('Bot restarted. mode: Webhook Development')
+            }
+        } catch (error) {
+            console.error(error)
         }
-
-    
-        console.info('Bot restarted. mode: Webhook')
     } else {
     
         await ctx.reply('Бот в режиме "Long Polling". Перезагрузка невозможна.')
