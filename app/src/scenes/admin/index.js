@@ -11,8 +11,9 @@ const {
 } = require('../../google')
 const { logWarn } = require('../../util/log')
 const json2html = require('../../util/json2html')
-const { exportURLStatsInHTML, sending } = require('../../helpers')
+const { exportURLStatsInHTML } = require('../../helpers')
 const { Loading, sendingAnimation } = require('../../helpers/loading')
+const bot = require('../../bot')
 
 const scene = new Scene('admin')
 
@@ -29,6 +30,24 @@ scene.hears(match('buttons.auth'), async ctx => {
         await ctx.replyWithHTML(ctx.i18n.t('other.url_text'), getAuthURLInlineKeyboard(ctx, url))
     } else {
         await ctx.replyWithHTML(ctx.i18n.t('other.url_text_error'))
+    }
+})
+
+scene.hears(match('buttons.reload_bot'), async ctx => {
+    if (process.env.NODE_ENV === 'dev_webhook') {
+        await ctx.reply(JSON.stringify(bot.telegram.getWebhookInfo()))
+
+        if (bot.telegram.deleteWebhook()) {
+            bot.telegram.setWebhook(process.env.TEST_WEB_HOOKS_SECRET_URL)
+            bot.startWebhook(process.env.TEST_WEB_HOOKS_PATH, null, process.env.TEST_PORT)
+            await ctx.reply('Бот был успешно перезагружен.\n\n' + JSON.stringify(bot.telegram.getWebhookInfo()))
+        }
+
+    
+        console.info('Bot restarted. mode: Webhook')
+    } else {
+    
+        await ctx.reply('Бот в режиме "Long Polling". Перезагрузка невозможна.')
     }
 })
 
