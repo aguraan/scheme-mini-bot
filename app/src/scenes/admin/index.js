@@ -38,8 +38,7 @@ scene.hears(match('buttons.reload_bot'), async ctx => {
     if (process.env.NODE_ENV === 'development') {
         return await ctx.reply('Бот в режиме "Long Polling". Перезагрузка невозможна.')
     }
-    const { pending_update_count } = await bot.telegram.getWebhookInfo()
-    await ctx.replyWithHTML(`<b>Перезагружаюсь...</b>\n\npending_update_count: ${ pending_update_count }`)
+    await ctx.replyWithHTML(`<b>Перезагружаюсь...</b>`)
     const loading = new Loading(clockAnimation)
     await loading.start(ctx)
     try {
