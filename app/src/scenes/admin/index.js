@@ -14,6 +14,7 @@ const json2html = require('../../util/json2html')
 const { exportURLStatsInHTML } = require('../../helpers')
 const { Loading, sendingAnimation, clockAnimation } = require('../../helpers/loading')
 const bot = require('../../bot')
+const store = require('../../session')
 
 const scene = new Scene('admin')
 
@@ -34,30 +35,66 @@ scene.hears(match('buttons.auth'), async ctx => {
 })
 
 scene.hears(match('buttons.reload_bot'), async ctx => {
-    if (process.env.NODE_ENV === 'dev_webhook') {
-        const { pending_update_count } = await bot.telegram.getWebhookInfo()
-        await ctx.replyWithHTML(`<b>Перезагружаюсь...</b>\n\npending_update_count: ${ pending_update_count }`)
-        const loading = new Loading(clockAnimation)
-        await loading.start(ctx)
-        try {
-            const deleted = await bot.telegram.deleteWebhook(true)
-            if (deleted) {
-                await bot.stop()
+    if (process.env.NODE_ENV === 'development') {
+        return await ctx.reply('Бот в режиме "Long Polling". Перезагрузка невозможна.')
+    }
+    const { pending_update_count } = await bot.telegram.getWebhookInfo()
+    await ctx.replyWithHTML(`<b>Перезагружаюсь...</b>\n\npending_update_count: ${ pending_update_count }`)
+    const loading = new Loading(clockAnimation)
+    await loading.start(ctx)
+    try {
+        const deleted = await bot.telegram.deleteWebhook(true)
+        const WEB_HOOKS_SECRET_URL = process.env.NODE_ENV === 'production' ? process.env.WEB_HOOKS_SECRET_URL : process.env.TEST_WEB_HOOKS_SECRET_URL
+        const WEB_HOOKS_PATH = process.env.NODE_ENV === 'production' ? process.env.WEB_HOOKS_PATH : process.env.TEST_WEB_HOOKS_PATH
+        const PORT = process.env.NODE_ENV === 'production' ? process.env.PORT : process.env.TEST_PORT
 
-                bot.telegram.setWebhook(process.env.TEST_WEB_HOOKS_SECRET_URL)
-                await bot.startWebhook(process.env.TEST_WEB_HOOKS_PATH, null, process.env.TEST_PORT)
-                const { pending_update_count } = await bot.telegram.getWebhookInfo()
-                await loading.end(ctx)
-                await ctx.replyWithHTML(`<b>✅ Бот был успешно перезагружен.</b>\n\npending_update_count: ${ pending_update_count }`)
+        if (deleted) {
+            await bot.stop()
 
-                console.info('Bot restarted. mode: Webhook Development')
-            }
-        } catch (error) {
-            console.error(error)
+            bot.telegram.setWebhook(WEB_HOOKS_SECRET_URL)
+            await bot.startWebhook(WEB_HOOKS_PATH, null, PORT)
+            const { pending_update_count } = await bot.telegram.getWebhookInfo()
+            await loading.end(ctx)
+            await ctx.replyWithHTML(`<b>✅ Бот был успешно перезагружен.</b>\n\npending_update_count: ${ pending_update_count }`)
+
+            console.info('Bot restarted. mode: Webhook Development')
         }
-    } else {
+    } catch (error) {
+        console.error(error)
+    }
+})
+
+scene.hears(match('buttons.wh_info'), async ctx => {
+    if (process.env.NODE_ENV === 'development') {
+        return await ctx.reply('Бот в режиме "Long Polling". Операция невозможна.')
+    }
+    const { pending_update_count } = await bot.telegram.getWebhookInfo()
+    await ctx.replyWithHTML(`<b>pending_update_count:</b> ${ pending_update_count }`)
+})
+
+scene.hears(match('buttons.sessions'), async ctx => {
+    const users = await ctx.db.users.find()
+
+    const out = [...store].map(([key, value]) => {
+        const user = users.find(user => user.id === value.session.userId)
+        if (!user) return ''
+        return `
+            <b>${ user.first_name } ${ user.last_name }</b> | ${ user.username || 'не установлен' }
+            Сцена: ${ value.session.__scenes.current }
+            Удалить -> /delete_${ user.id }
+        `
+    })
     
-        await ctx.reply('Бот в режиме "Long Polling". Перезагрузка невозможна.')
+    await ctx.replyWithHTML(`<b>Сессии:</b>\n${ out.join('\n---------------------\n') }`)
+})
+
+scene.hears(/\/delete_(.*)/, async ctx => {
+    const sessionKey = `${ ctx.match[1] }:${ ctx.match[1] }`
+    const deleted = store.delete(sessionKey)
+    if (deleted) {
+        await ctx.reply(`✅ Сессия успешно удалена: ${ sessionKey }`)
+    } else {
+        await ctx.reply(`❌ Сессия не была найдена. Операция отменена.`)
     }
 })
 

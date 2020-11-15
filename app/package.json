@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index",
-    "dev": "nodemon index",
+    "start": "NODE_ENV=production node index",
+    "dev": "NODE_ENV=development nodemon index",
     "dev_webhook": "NODE_ENV=dev_webhook nodemon index"
   },
   "repository": {

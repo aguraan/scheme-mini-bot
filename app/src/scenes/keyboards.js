@@ -9,8 +9,8 @@ const getMainKeyboard = ctx => {
 
 const getAdminKeyboard = ctx => {
     return Markup.keyboard([
-        [ctx.i18n.t('buttons.auth')],
-        [ctx.i18n.t('buttons.reload_bot')],
+        [ctx.i18n.t('buttons.auth'), ctx.i18n.t('buttons.wh_info')],
+        [ctx.i18n.t('buttons.reload_bot'), ctx.i18n.t('buttons.sessions')],
         [ctx.i18n.t('buttons.export')],
         [ctx.i18n.t('buttons.edit_links')],
         [ctx.i18n.t('buttons.get_file')],

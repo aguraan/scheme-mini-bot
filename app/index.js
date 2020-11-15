@@ -15,7 +15,7 @@ if (process.env.NODE_ENV === 'production') {
     bot.startWebhook(process.env.WEB_HOOKS_PATH, null, process.env.PORT)
 
     console.info('Bot launched. mode: Webhook')
-} else  if (process.env.NODE_ENV ==='dev_webhook') {
+} else  if (process.env.NODE_ENV === 'dev_webhook') {
 
     bot.telegram.setWebhook(process.env.TEST_WEB_HOOKS_SECRET_URL)
     bot.startWebhook(process.env.TEST_WEB_HOOKS_PATH, null, process.env.TEST_PORT)
